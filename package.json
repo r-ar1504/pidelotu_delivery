@@ -1,0 +1,33 @@
+{
+  "name": "pidelo_tu_delivery_man",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "node node_modules/react-native/local-cli/cli.js start",
+    "test": "jest"
+  },
+  "dependencies": {
+    "native-base": "^2.4.3",
+    "react": "16.3.1",
+    "react-native": "0.55.3",
+    "react-native-elements": "^0.19.1",
+    "react-native-onesignal": "^3.1.4",
+    "react-native-vector-icons": "^4.6.0",
+    "react-navigation": "^1.5.11",
+    "tcomb-form-native": "^0.6.11"
+  },
+  "devDependencies": {
+    "babel-jest": "22.4.3",
+    "babel-preset-react-native": "4.0.0",
+    "jest": "22.4.3",
+    "react-test-renderer": "16.3.1"
+  },
+  "jest": {
+    "preset": "react-native"
+  },
+  "rnpm": {
+    "assets": [
+      "./src/assets/fonts/Lato"
+    ]
+  }
+}
