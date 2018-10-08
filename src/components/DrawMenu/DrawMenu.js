@@ -16,6 +16,12 @@ export default class DrawMenu extends Component{
   constructor(props){
     super(props);
 
+   this.state = {
+     user: this.props.navigation.getParam('user')
+   }
+
+   console.log(this.state.user);
+   
     /*Method binding*/
     this.dismissSide = this.dismissSide.bind(this);
     this.logOut = this.logOut.bind(this);
@@ -24,7 +30,7 @@ export default class DrawMenu extends Component{
 
   /* Close side menu. */
   dismissSide(){
-    this.props.navigation.navigate('DrawerClose');
+    this.props.navigation.closeDrawer();
   }
 
   logOut(){
@@ -79,12 +85,13 @@ export default class DrawMenu extends Component{
             </Right>
           </Header>
             <View style={Style.profile}>
-              <Image source={require('src/assets/images/person.png')}
+              <Image source={{uri: 'https://pidelotu.mx/images/delivery_man/' + global.user.name + '-logo.png'}}
                 style={{
-                  height: 150,
-                  width: 150,
+                  height: 100,
+                  width: 100,
                   borderRadius: 100,
                   borderWidth: 1,
+                  padding: 30,
                   borderColor: '#fff',
                 }}
                 />
@@ -95,7 +102,7 @@ export default class DrawMenu extends Component{
                   fontSize: 20,
                   fontFamily: 'Lato-Regular'
                 }}>
-                Jorge Luis
+                {global.user.name}
               </Text>
             </View>
             <View style={{
@@ -116,7 +123,6 @@ export default class DrawMenu extends Component{
                   borderBottomWidth: 1,
                   borderBottomColor: '#fff'
                 }}>
-                Mi Perfil
               </Text>
             </View>
             <View style={{
@@ -138,10 +144,9 @@ export default class DrawMenu extends Component{
                 }} >
                 <Text style={{
                   color: '#fff',
-                  marginLeft: 30,
                   fontSize: 19,
                   fontFamily: 'Lato-Regular',
-                  alignSelf: 'flex-start',
+                  alignSelf: 'center',
                   overflow: 'visible',
                   }}>
                   Cerrar sesión

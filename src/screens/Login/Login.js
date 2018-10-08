@@ -58,6 +58,7 @@ export default class Login extends Component{
     AsyncStorage.getItem('user').then( (query) =>{
       var user_data = JSON.parse(query);
       if(query != null){
+        global.user = user_data;
         console.log(user_data)
         fetch('https://pidelotu.azurewebsites.net/check_status/'+ user_data.app_code, {
           method: 'GET',

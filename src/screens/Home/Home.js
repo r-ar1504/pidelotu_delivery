@@ -57,7 +57,6 @@ export default class Home extends Component{
           this.setState({
             granted: true
           })
-          console.log("Granted");
         } else {
           console.log("Location  permission denied")
         }
@@ -82,6 +81,7 @@ export default class Home extends Component{
             user: user
           })
 
+
           this.updateLocation();
         }else{
           this.props.navigation.navigate('LoginStack');
@@ -98,7 +98,6 @@ export default class Home extends Component{
         latitude :  position.coords.latitude, 
         longitude:  position.coords.longitude
       });
-      console.log(this.state);
 
       fetch('https://pidelotu.azurewebsites.net/update_location',
       {
@@ -122,7 +121,6 @@ export default class Home extends Component{
     (error) => {
       console.log(error.code, error.message);
     });
-    console.log(this.state)
     
 
   }//Update location after login.
@@ -188,7 +186,7 @@ export default class Home extends Component{
    }//OneSignal notification clicked;
 
   openDrawer(){
-    this.props.navigation.navigate('DrawerOpen'); // Drawer Open
+    this.props.navigation.openDrawer();
   }//Open SideMenu
 
   getOrder(){
@@ -201,7 +199,6 @@ export default class Home extends Component{
     }).then(  response   => response.json())
     .then( (response ) => {
 
-      console.log(response);
 
     });
 
@@ -209,7 +206,6 @@ export default class Home extends Component{
     AsyncStorage.getItem('order').then( (active_order) =>{
 
       let order = JSON.parse(active_order);
-      console.log(order);
 
       Alert.alert(
         'PídeloTú',
