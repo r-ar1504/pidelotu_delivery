@@ -98,7 +98,7 @@ function iconLabelTemplate(locals){
 
   return(
     <View style={containerStyle}>
-      <Icon name="user" type='feather' color={'#fff'}  size={25} containerStyle={iconStyle}/>
+      <Icon name="person" iconType={"fontawesome"} color={'#fff'}  size={25} containerStyle={iconStyle}/>
       <Text style={labelStyle}> {locals.label}</Text>
       <TextInput
         style={textBoxStyle}

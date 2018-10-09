@@ -3,7 +3,6 @@
 *-----------------------------------------------------------------*/
 import React, { Component } from 'react';
 import Icon from 'react-native-vector-icons/FontAwesome';
-import { StackNavigator } from 'react-navigation';
 import { AsyncStorage, StyleSheet, ImageBackground,TouchableWithoutFeedback, View, Text, Image, YellowBox, ActnativeivityIndicator, Alert } from 'react-native';
 import { Container, Header,Footer, Body, Left, Right, Content, Button } from 'native-base';
 /*-----------------------------------------------------------------
@@ -25,6 +24,9 @@ export default class DrawMenu extends Component{
     /*Method binding*/
     this.dismissSide = this.dismissSide.bind(this);
     this.logOut = this.logOut.bind(this);
+    this.openOrders = this.openOrders.bind(this);
+    this.openBalance = this.openBalance.bind(this);
+
 
   }//Constructor End
 
@@ -60,6 +62,13 @@ export default class DrawMenu extends Component{
    
 
 
+  }
+  openOrders(){
+    this.props.navigation.navigate('Orders');
+  }
+
+  openBalance(){
+    this.props.navigation.navigate('Stripe');
   }
 
   render(){
@@ -132,27 +141,11 @@ export default class DrawMenu extends Component{
                 justifyContent: 'center',
                 alignItems: 'center',
               }} >
-              <ListItem iconName={"book"} iconType={"materialdesignicons"} linkName={"Historial de pedidos"}/>
-              <ListItem iconName={"question"} iconType={"fontawesome"} linkName={"Manual de ayuda"}/>
+              <ListItem goTo={this.openOrders} iconName={"book"} iconType={"materialdesignicons"} linkName={"Historial de pedidos"}/>
+              <ListItem goTo={this.openBalance}iconName={"dollar"} iconType={"fontawesome"} linkName={"Cuenta"}/>
+              <ListItem  goTo={this.logOut}iconName={"times"} iconType={"fontawesome"} linkName={" Cerrar sesión"}/>
+
             </View>
-            <TouchableWithoutFeedback onPress={this.logOut}>
-              <View style={{
-                  marginTop: 300,
-                  width: 300,
-                  justifyContent: 'center',
-                  alignItems: 'center',
-                }} >
-                <Text style={{
-                  color: '#fff',
-                  fontSize: 19,
-                  fontFamily: 'Lato-Regular',
-                  alignSelf: 'center',
-                  overflow: 'visible',
-                  }}>
-                  Cerrar sesión
-                </Text>
-              </View>
-            </TouchableWithoutFeedback>
         </View>
       </ImageBackground>
       </Container>
@@ -179,7 +172,7 @@ export class ListItem extends Component{
             flexWrap: 'nowrap',
             justifyContent: 'flex-start',
             alignItems: 'flex-start',
-            width: 160,
+            width: '90%',
             overflow: 'visible',
           }}>
           <Icon name={this.props.iconName} color={'#fff'}  size={17} />

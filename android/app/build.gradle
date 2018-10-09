@@ -156,6 +156,7 @@ android {
 }
 
 dependencies {
+    compile project(':react-native-vector-icons')
     compile project(':react-native-onesignal')
     implementation 'com.onesignal:OneSignal:[3.9.1, 3.99.99]'
 

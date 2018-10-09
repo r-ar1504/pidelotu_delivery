@@ -3,8 +3,8 @@ package com.pidelotu_delivery;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
-import com.geektime.rnonesignalandroid.ReactNativeOneSignalPackage;
 import com.oblador.vectoricons.VectorIconsPackage;
+import com.geektime.rnonesignalandroid.ReactNativeOneSignalPackage;
 import com.airbnb.android.react.maps.MapsPackage;
 import com.agontuk.RNFusedLocation.RNFusedLocationPackage;
 import com.devfd.RNGeocoder.RNGeocoderPackage;
@@ -28,8 +28,8 @@ public class MainApplication extends Application implements ReactApplication {
     protected List<ReactPackage> getPackages() {
       return Arrays.<ReactPackage>asList(
           new MainReactPackage(),
-            new ReactNativeOneSignalPackage(),
             new VectorIconsPackage(),
+            new ReactNativeOneSignalPackage(),
             new MapsPackage(),
             new RNFusedLocationPackage(),
             new RNGeocoderPackage()

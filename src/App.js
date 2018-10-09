@@ -15,6 +15,9 @@ import Login from './screens/Login/Login';
 import Home from './screens/Home/Home';
 import OrderAlert from './screens/OrderAlert/OrderAlert'
 import ActiveOrder from './screens/ActiveOrder/ActiveOrder'
+import Orders from './screens/Orders/Orders'
+import Stripe from './screens/Stripe/Stripe'
+
 /*-----------------------------------------------------------------
 * Drawer Components                                               |
 *-----------------------------------------------------------------*/
@@ -36,8 +39,15 @@ const HomeDrawer = DrawerNavigator({
   },
   ActiveOrder:{
     screen: ActiveOrder
+  },
+    Orders:{
+    screen: Orders
+  },
+  Stripe:{
+    screen: Stripe
   }
 },
+
   {
     initialRouteName: 'Home',
     contentComponent: DrawMenu,
@@ -55,7 +65,7 @@ const LoginStack = StackNavigator({
   }
   },
   {
-  initialRouteName: 'Splash',
+  initialRouteName: 'Login',
   headerMode: 'none'
   }
 );

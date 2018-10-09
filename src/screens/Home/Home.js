@@ -242,7 +242,7 @@ export default class Home extends Component{
           >
             <Header style={{
                 backgroundColor: 'transparent',
-                width: '85%',
+                width: '90%',
                 borderWidth: 0,
                 borderBottomWidth: 1,
                 borderBottomColor: 'rgba(255, 255, 255, 0.47)',
@@ -262,11 +262,11 @@ export default class Home extends Component{
               <Body>
               </Body>
               <Right>
-                <Icon name="user" type='feather' color={'#fff'}  size={20} />
+                <Icon name="person"  iconType={"fontawesome"} color={'#fff'}  size={20} />
                 <Text
                   style={{
                     color:'#fff',
-                    fontSize: 17,
+                    fontSize: 15,
                     fontFamily: 'Lato-Regular',
                     marginLeft:10
                   }}>
