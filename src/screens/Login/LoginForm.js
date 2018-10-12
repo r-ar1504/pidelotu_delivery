@@ -18,17 +18,29 @@ const stylesheet = _.cloneDeep(t.form.Form.stylesheet);
 
 
 const User =  t.struct({
+  user: t.String,
   user_code: t.String,
 });//User model for form
-
 
 const options = {
  stylesheet: stylesheet,
  fields:{
    user_code:{
       template: iconLabelTemplate,
-      label:'Codigo de verificación'
-   }
+      label:'Codigo de verificación',
+      config: {
+      icon:'lock',
+      hidden: true
+      }
+   },
+  user:{
+    template: iconLabelTemplate,
+    label:'Correo',
+    config: {
+    icon:'person',
+    hidden: false
+    }
+ }
  }
 }
 
@@ -67,7 +79,7 @@ export default class LoginForm extends Component {
 *-----------------------------------------------------------------*/
 function iconLabelTemplate(locals){
   var containerStyle = {
-      marginTop: 90,
+      marginTop: 30,
       width: 300,
       alignItems: 'center',
       justifyContent: 'center',
@@ -75,7 +87,7 @@ function iconLabelTemplate(locals){
       flexWrap: 'wrap'
   };
   var labelStyle = {
-    paddingTop: 10,
+    paddingTop: 5,
     width: 240,
     color: '#fff',
     fontSize: 20,
@@ -94,19 +106,20 @@ function iconLabelTemplate(locals){
       padding: 20,
       width:300,
       textDecorationLine: 'none'
-    };
+  };
 
   return(
-    <View style={containerStyle}>
-      <Icon name="person" iconType={"fontawesome"} color={'#fff'}  size={25} containerStyle={iconStyle}/>
+  <View style={containerStyle}>
+      <Icon name={locals.config.icon} iconType={"fontawesome"} color={'#fff'}  size={25} containerStyle={iconStyle}/>
       <Text style={labelStyle}> {locals.label}</Text>
       <TextInput
         style={textBoxStyle}
         underlineColorAndroid='transparent'
-        secureTextEntry={true}
+        secureTextEntry={locals.config.hidden}
         onChangeText={(value) => locals.onChange(value)}
         />
     </View>
+
   );
 
 }

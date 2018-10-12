@@ -15,6 +15,9 @@ export default class Stripe extends Component {
       code: 400,
       balance: 0
     };
+
+    this.fetchData = this.fetchData.bind(this);
+    this.goBack = this.goBack.bind(this);
   }
 
   goBack(){

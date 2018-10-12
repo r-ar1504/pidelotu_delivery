@@ -65,7 +65,7 @@ const LoginStack = StackNavigator({
   }
   },
   {
-  initialRouteName: 'Login',
+  initialRouteName: 'Splash',
   headerMode: 'none'
   }
 );
@@ -80,9 +80,6 @@ export default StackNavigator({
   LoginStack:{
     screen: LoginStack
   },
-  ActiveOrder:{
-    screen: ActiveOrder
-  }
 },
   {
     initialRouteName: 'LoginStack',

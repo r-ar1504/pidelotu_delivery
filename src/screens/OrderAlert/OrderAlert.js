@@ -26,21 +26,40 @@ export default class OrderAlert extends Component{
       order_status:     this.props.navigation.getParam('status'),
       order_number:     this.props.navigation.getParam('id'),
       user_name:        this.props.navigation.getParam('user_name'),
-      user_code:        this.props.navigation.getParam('user_code')
+      user_code:        this.props.navigation.getParam('user_code'),
+      human_address: ""
     }
     
-    console.log(this.state)
-
     /*Method binding*/
     this.openDrawer =      this.openDrawer.bind(this);
     this.initializeOrder = this.initializeOrder.bind(this);
     this.rejectOrder =     this.rejectOrder.bind(this);
+    this.translateCoordinates = this.translateCoordinates.bind(this);
+    this.translateCoordinates();
   }//Constructor End
 
   openDrawer(){
     this.props.navigation.navigate('DrawerOpen'); // open drawer
   }
 
+  translateCoordinates(){
+    var google_url = "https://maps.googleapis.com/maps/api/geocode/json?latlng="+ this.state.user_lat +"," + this.state.user_lng + "&key=AIzaSyBY3nmoAufv_W5oIuvQMimP4mpxSaJH_BI"
+    
+    fetch( google_url, {
+      method: 'GET',
+      headers: {
+        'Content-Type' : 'json/application'
+      }
+    }).then(response => response.json())
+        .then( response =>{
+          // console.log('Google Response', response.results[2].formatted_address);
+          this.setState({
+            human_address:  response.results[2].formatted_address
+          })
+        })
+
+  }
+   //{TODO}https://pidelotu.azurewebsites.net
   rejectOrder(){
     fetch('https://pidelotu.azurewebsites.net/reject_delivery/'+ this.state.order_number + '/' + this.state.user_code,{
       method: 'GET',
@@ -56,26 +75,29 @@ export default class OrderAlert extends Component{
 
         this.props.navigation.navigate('Home');
 
-      }
+      }else if( response.status == 'ok')
+
+      this.props.navigation.navigate('Home', {user_name: global.user.name})
     });
   }
 
   componentDidMount(){
-
+    this.translateCoordinates();
   }
 
   initializeOrder(){
-    console.log("initialize", this.state);
     fetch('https://pidelotu.azurewebsites.net/assign_delivery/'+ this.state.order_number + '/' + this.state.user_code,{
       method: 'GET',
       headers: {
         "Content-Type": "application/json"
       }
-    }).then(response => response.json())
-    .then( (response) =>{
+      }).then(response => response.json())
+      .then( (response) =>{
+
+      // console.log(response);
       if (response.status == 500) {
         Alert.alert(
-          'PídeloTú',
+          'PídeloTú', 
           'No ha sido posible asignarte la orden.',
           [
             {text: 'Volver al menu', onPress: () => {
@@ -89,6 +111,8 @@ export default class OrderAlert extends Component{
           { cancelable: false }
         )
       }else{
+        // console.log("initialize", this.state);
+        AsyncStorage.setItem('active_order', '1');
 
         fetch('https://pidelotu.azurewebsites.net/fetch_order/'+ this.state.order_number ,{
           method: 'GET',
@@ -100,16 +124,9 @@ export default class OrderAlert extends Component{
             this.setState({
               order_status: response.order.status
           });
-
-          this.props.navigation.navigate('ActiveOrder',  {
-            order_status: this.state.order_status,
-            order_number: this.state.order_number,
-            restaurant_name: this.state.restaurant_name,
-            user_name: this.state.user_name,
-            user_lat: this.state.user_lat,
-            user_lng: this.state.user_lng,
-            res_lat: this.state.res_lat,
-            res_lng: this.state.res_lng,
+          // console.log(response)
+          this.props.navigation.navigate('ActiveOrder',{
+            order_number: response.order.id,
           })
     
         })
@@ -196,7 +213,19 @@ export default class OrderAlert extends Component{
                     textAlign: 'center',
                     marginTop:50
                   }}>
-                Pedido Entrante #{this.state.id}
+                Pedido Entrante #{this.state.order_number}
+
+                </Text>
+                <Text
+                  style={{
+                    color:'#fff',
+                    fontSize: 20,
+                    fontFamily: 'Lato-Regular',
+                    width: 200,
+                    textAlign: 'center',
+                    marginTop:50
+                  }}>
+                  Restaurante: {this.state.restaurant_name}
 
                 </Text>
                 <Text
@@ -208,7 +237,8 @@ export default class OrderAlert extends Component{
                     textAlign: 'center',
                     marginTop:20
                   }}>
-                  {this.state.user_lat}  {this.state.user_lng}
+                    Entrega en :
+                   {this.state.human_address}
                 </Text>
                 <TouchableOpacity onPress={this.initializeOrder}>
                   <View style={Style.order_button_accept}>

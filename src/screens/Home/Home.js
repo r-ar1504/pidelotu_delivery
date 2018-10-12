@@ -15,11 +15,11 @@ import Style from './HomeStyle';
 export default class Home extends Component{
   constructor(props){
     super(props);
-
-
     this.state = {
       granted: false
     }
+
+    // AsyncStorage.removeItem('active_order');    
     /*Method binding*/
     this.openDrawer       = this.openDrawer.bind(this);
     this.pushHandler      = this.pushHandler.bind(this);
@@ -27,7 +27,9 @@ export default class Home extends Component{
     this.checkSession     = this.checkSession.bind(this);
     this.updateLocation   = this.updateLocation.bind(this);
     this.grantLocationPermission = this.grantLocationPermission.bind(this);
-    this.hasActiveOrder = this.hasActiveOrder.bind(this)
+    this.hasActiveOrder = this.hasActiveOrder.bind(this);
+    this.loadTestData = this.loadTestData.bind(this)
+    
   }//Constructor End
 
   componentWillMount(){
@@ -68,6 +70,11 @@ export default class Home extends Component{
   componentDidMount(){
     this.checkSession();
     this.hasActiveOrder();
+    if( global.user.app_code == 'PDTEST'){
+      this.loadTestData();
+  }else{
+    return;
+  }
   }//Component Mounted (DOM)
   
   checkSession(){
@@ -80,8 +87,7 @@ export default class Home extends Component{
             user_code: user.app_code,
             user: user
           })
-
-
+          
           this.updateLocation();
         }else{
           this.props.navigation.navigate('LoginStack');
@@ -90,6 +96,18 @@ export default class Home extends Component{
     )
 
   }//Check if user is already logged in.
+
+  loadTestData(){
+    fetch('http://pidelotu.azurewebsites.net/load_test_data/',{
+      headers: {
+        "Content-Type": "application/json",
+        Accept: 'application/json',
+      },
+    }).then(  response   => response.json())
+    .then( (response ) => {
+      console.log("OK");
+    });
+  }
 
   updateLocation(){
     Geolocation.getCurrentPosition( (position) =>{
@@ -129,8 +147,14 @@ export default class Home extends Component{
     AsyncStorage.getItem('active_order').then( (query) =>{
       
       var active_order = JSON.parse(query);
+      console.log('Active_Order', active_order)
       if (query != null) {
-        this.getOrder();
+
+        AsyncStorage.getItem('order').then( (query) =>{
+          var order = JSON.parse(query);
+
+         this.getOrder(order);  
+        });
 
       }else{
         // console.warn("nothing")
@@ -189,8 +213,8 @@ export default class Home extends Component{
     this.props.navigation.openDrawer();
   }//Open SideMenu
 
-  getOrder(){
-
+  getOrder(order){
+    console.log(order)
     fetch('http://pidelotu.azurewebsites.net/fetch_order/' + order.id,{
       headers: {
         "Content-Type": "application/json",
@@ -198,27 +222,30 @@ export default class Home extends Component{
       },
     }).then(  response   => response.json())
     .then( (response ) => {
-
-
-    });
-
-    return ;
-    AsyncStorage.getItem('order').then( (active_order) =>{
-
-      let order = JSON.parse(active_order);
+      console.log(response);
 
       Alert.alert(
         'PídeloTú',
         'Tienes un pedido activo',
         [
           {text: 'Continuar', onPress: () => {
-            
+            this.props.navigation.navigate('ActiveOrder',  {
+                order_number: response.order.id,
+                // order_number: response.order.id,
+                // restaurant_name: response.restaurant.name,
+                // user_name: response.user.name,
+                // user_lat: response.order.latitude,
+                // user_lng: response.order.longitude,
+                // res_lat: response.restaurant.latitude,
+                // res_lng: response.restaurant.longitude,
+              })
           }}
         ],
         {cancelable: false}
       )
 
     });
+
   }//Reopen active order.
 
   render(){

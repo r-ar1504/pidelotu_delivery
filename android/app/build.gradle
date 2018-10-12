@@ -110,7 +110,14 @@ def enableProguardInReleaseBuilds = false
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
-
+    signingConfigs {
+        release {
+            storeFile file(PTD_RELEASE_STORE_FILE)
+            storePassword PTD_RELEASE_STORE_PASSWORD
+            keyAlias PTD_RELEASE_KEY_ALIAS
+            keyPassword PTD_RELEASE_KEY_PASSWORD
+        }
+    }
     defaultConfig {
     //    manifestPlaceholders = [
     //         onesignal_app_id: 'baedd007-9325-4e3e-83fc-d8be136450bd',
@@ -136,6 +143,7 @@ android {
     }
     buildTypes {
         release {
+            signingConfig signingConfigs.release
             minifyEnabled enableProguardInReleaseBuilds
             proguardFiles getDefaultProguardFile("proguard-android.txt"), "proguard-rules.pro"
         }
@@ -157,6 +165,9 @@ android {
 
 dependencies {
     compile project(':react-native-vector-icons')
+    compile project(':react-native-maps')
+    compile project(':react-native-geolocation-service')
+    compile project(':react-native-geocoder')
     compile project(':react-native-onesignal')
     implementation 'com.onesignal:OneSignal:[3.9.1, 3.99.99]'
 
@@ -165,7 +176,7 @@ dependencies {
     implementation project(':react-native-geolocation-service')
     implementation project(':react-native-geocoder')
     implementation fileTree(dir: "libs", include: ["*.jar"])
-    implementation "com.android.support:appcompat-v7:${rootProject.ext.supportLibVersion}"
+    implementation "com.android.support:appcompat-v7:27.1.1"
     implementation "com.facebook.react:react-native:+"  // From node_modules
 }
 

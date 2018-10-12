@@ -2,10 +2,7 @@
 * Default Components                                              |
 *-----------------------------------------------------------------*/
 import React, { Component } from 'react';
-import { PermissionsAndroid } from 'react-native';
-import { Icon } from 'react-native-elements'
-import { StackNavigator, DrawerNavigator } from 'react-navigation';
-import { StyleSheet, AsyncStorage, Dimensions, ImageBackground, TouchableWithoutFeedback, TouchableOpacity, View, Text, Image, YellowBox, ActnativeivityIndicator, Alert } from 'react-native';
+import {ActivityIndicator, StyleSheet, AsyncStorage, Dimensions, ImageBackground, TouchableWithoutFeedback, TouchableOpacity, View, Text, Image, YellowBox, ActnativeivityIndicator, Alert } from 'react-native';
 import { Container, Header, Body,Footer, Left, Right, Content, Button } from 'native-base';
 import MapView from 'react-native-maps';
 import MapViewDirections from 'react-native-maps-directions';
@@ -20,66 +17,35 @@ import Styles from './ActiveOrderStyle';
 
 var height = Dimensions.get('window').height
 var width  = Dimensions.get('window').width;
-const LATITUD_DELTA = 0.0922;
-const LONGITUDE_DELTA = 0.0922;
+const LATITUD_DELTA = 0.0922/3;
+const LONGITUDE_DELTA = 0.0922/3;
 
 
 export default class ActiveOrder extends Component{
   constructor(props){
     super(props);
-    
-    this.state = {
-      restaurant_coordinates:{
-       latitude:  this.props.navigation.getParam('res_lat'),
-       longitude: this.props.navigation.getParam('res_lng')
-      },
-      delivery_coordinates:{
-       latitude:   25.543814,
-       longitude: -103.406257,
-       latitudeDelta: 0.0142,
-        longitudeDelta: 0.0011
-      },
-      user_coordinates:{
-        latitude:  this.props.navigation.getParam('user_lat'),
-        longitude: this.props.navigation.getParam('user_lng'),
-        latitudeDelta: 0.0142,
-        longitudeDelta: 0.0011
-      },
-      next_coordinates:{
-        latitude:  25.541158,
-        longitude: -103.449019
-      },
-      region:{
-       latitude: parseFloat(this.props.navigation.getParam("res_lat")),
-       longitude: parseFloat(this.props.navigation.getParam("res_lng")),
 
-      },
-      restaurant_name: this.props.navigation.getParam('restaurant_name'),
-      order_status: this.props.navigation.getParam('order_status'),
-      order_number: this.props.navigation.getParam('order_number'),
-      user_name: this.props.navigation.getParam('user_name'),
-    }
-    console.log(this.state.order_status);
+    this.state = ({
+      order_number:  this.props.navigation.getParam("order_number")
+    })
+    console.log(this.state);
 
+    this.fetchData();
 
+    console.log(this.state);
     /*Method binding*/
     this.changeStatus = this.changeStatus.bind(this);
+    this.fetchData = this.fetchData.bind(this);
+    this.trackLocation = this.trackLocation.bind(this);
 
   }//Constructor End  
 
-  componentWillMount(){
-    this.setState({
-      restaurant_name: this.props.navigation.getParam('restaurant_name'),
-      order_status: this.props.navigation.getParam('order_status'),
-      order_number: this.props.navigation.getParam('order_number'),
-      user_name: this.props.navigation.getParam('user_name'),
-    })
-  };
+  // componentWillMount(){
+  // }
   
   changeStatus(){
     switch (this.state.order_status) {
-      case 1:
-       alert(this.state.order_status)
+      case 2:
         this.setState({
           order_status: this.state.order_status + 1,
           next_coordinates: this.state  .user_coordinates
@@ -94,21 +60,29 @@ export default class ActiveOrder extends Component{
           console.log(response);
         })
         break;
-      case 2:
-        alert(this.state.order_status)
+      case 3:
         this.setState({
           order_status: this.state.order_status + 1,
           next_coordinates: this.state.user_coordinates
         });// Notify user.
+        fetch('https://pidelotu.azurewebsites.net/notify_client/'+ this.state.order_number,{
+          method: 'GET',
+          headers: {
+            "Content-Type": "application/json"
+          }
+        }).then(response => response.json())
+        .then( (response) =>{
+          console.log(response);
+        })
         break;
-      case 3:
-        alert(this.state.order_status)
+      case 4:
         this.setState({
           order_status: this.state.order_status + 1
         });// End order and return another screen.
-        AsyncStorage.removeItem('active_order');
         break;
-      case 4:
+      case 5:
+
+        AsyncStorage.removeItem('active_order');
         this.props.navigation.navigate('Home');
         break;
     }
@@ -128,7 +102,111 @@ export default class ActiveOrder extends Component{
     })
   }
 
-  componentDidMount(){
+  renderMap(){
+    if( this.state.loading != false ){
+      return(
+         <View style={{height: '100%', backgroundColor: '#132A43', justifyContent: 'center', alignItems: 'center'}}>
+          <ActivityIndicator size="large" color="#fff" />
+         </View>
+      )
+    }else{
+      return(
+        <View style={{height: '100%'}}>
+          <MapView  style={styles.map} customMapStyle={mapStyle} zoomEnabled = {true} 
+            initialRegion={{
+              latitude:this.state.delivery_coordinates.latitude,
+              longitude: this.state.delivery_coordinates.longitude,
+              latitudeDelta: LATITUD_DELTA,
+              longitudeDelta: LONGITUDE_DELTA
+            }}
+          >
+            <MapView.Marker 
+             coordinate={this.state.delivery_coordinates} 
+              image={require('src/assets/images/current.png')}
+              title={'Tu posición Actual'}
+            />
+            <MapView.Marker 
+              coordinate={this.state.next_coordinates} 
+              image={require('src/assets/images/food_pickup.png')}
+              title={'Destino'}
+            />   
+            
+             <MapViewDirections
+              apikey={'AIzaSyBY3nmoAufv_W5oIuvQMimP4mpxSaJH_BI'}
+              origin={this.state.delivery_coordinates}
+              destination={this.state.next_coordinates}
+              strokeWidth={2}
+              strokeColor={'blue'}>
+            </MapViewDirections>   
+  
+          </MapView>     
+          <View position={'absolute'} zIndex={999} bottom={0} style={{width: width, flexDirection: 'row', flexWrap: 'nowrap'}}>
+              
+              <View style={Styles.bottomSection}>
+               <ActiveFooter order={this.state}/>
+              </View>
+              
+              <View style={Styles.bottomSection}>
+               <OrderButton status={this.state.order_status} statusChange={this.changeStatus} />
+              </View>  
+                   
+          </View> 
+        </View>
+      )
+    }
+  }
+
+  fetchData(){
+    fetch('http://pidelotu.azurewebsites.net/fetch_order/'+this.state.order_number,{
+      headers: {
+        "Content-Type": "application/json",
+        Accept: 'application/json',
+      },
+    }).then(  response   => response.json())
+    .then( (response ) => {
+
+        this.setState({
+          restaurant_coordinates:{
+            latitude: parseFloat(response.restaurant.latitude),
+            longitude: parseFloat(response.restaurant.longitude),
+          },
+          user_coordinates:{
+            latitude: parseFloat(response.order.latitude),
+            longitude: parseFloat(response.order.longitude),
+            latitudeDelta: 0.0142,
+            longitudeDelta: 0.0011
+          },
+          region:{
+           latitude: parseFloat(response.restaurant.latitude),
+           longitude: parseFloat(response.restaurant.longitude),
+          },
+          restaurant_name: response.restaurant.name,
+          order_status:response.order.status,
+          order_number: response.order.id,
+          user_name: response.user.name,
+        })
+
+        if(response.order.status < 3){
+          this.setState({
+            next_coordinates:{
+              latitude: parseFloat(response.restaurant.latitude),
+              longitude: parseFloat(response.restaurant.longitude),
+            },
+          })
+        }else{
+          this.setState({
+            next_coordinates:{
+              latitude: parseFloat(response.order.latitude),
+              longitude: parseFloat(response.order.longitude),
+            },
+          })
+        }
+
+        this.trackLocation()
+    });
+  }
+
+  trackLocation(){
     Geolocation.watchPosition( (position) => {
       this.setState({
         delivery_coordinates:{
@@ -139,61 +217,45 @@ export default class ActiveOrder extends Component{
           latitude: position.coords.latitude,
           longitude: position.coords.longitude
         },
+        loading: false
       });
+
+      fetch('https://pidelotu.azurewebsites.net/update_location_active',{
+        method: 'POST',
+        headers: {
+          "Content-Type": "application/json",
+          Accept: 'application/json',
+        },
+        body:JSON.stringify({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+          id : this.state.id
+        })
+      }
+    ).then(  response   => response.json())
+      .then( (response ) => {
+      });
+
       console.log(this.state);
     },
     (error) => {
       console.warn(error);
     },
     {
-      maximumAge: 3000,
+      maximumAge: 2000,
       timeout: 3000
     });//End of watchPosition.
-    console.log(this.order_status);
+
+
+  }
+
+  componentDidMount(){
   }//End of componentDidMount.
   
   render(){
     return(
       <View style={{height: '100%'}}>
-        <MapView  style={styles.map} customMapStyle={mapStyle} zoomEnabled = {true} 
-          initialRegion={{
-            latitude:this.state.delivery_coordinates.latitude,
-            longitude: this.state.delivery_coordinates.longitude,
-            latitudeDelta: LATITUD_DELTA,
-            longitudeDelta: LONGITUDE_DELTA
-          }}
-        >
-          <MapView.Marker 
-           coordinate={this.state.delivery_coordinates} 
-            image={require('src/assets/images/current.png')}
-            title={'Tu posición Actual'}
-          />
-          <MapView.Marker 
-            coordinate={this.state.next_coordinates} 
-            image={require('src/assets/images/food_pickup.png')}
-            title={'Destino'}
-          />   
-          
-           <MapViewDirections
-            apikey={'AIzaSyBY3nmoAufv_W5oIuvQMimP4mpxSaJH_BI'}
-            origin={this.state.delivery_coordinates}
-            destination={this.state.next_coordinates}
-            strokeWidth={2}
-            strokeColor={'blue'}>
-          </MapViewDirections>   
-
-        </MapView>     
-        <View position={'absolute'} zIndex={999} bottom={0} style={{width: width, flexDirection: 'row', flexWrap: 'nowrap'}}>
-            
-            <View style={Styles.bottomSection}>
-             <ActiveFooter order={this.state}/>
-            </View>
-            
-            <View style={Styles.bottomSection}>
-             <OrderButton status={this.state.order_status} statusChange={this.changeStatus} />
-            </View>  
-                 
-        </View> 
+        {this.renderMap()}
       </View>
     )
   }
@@ -211,7 +273,7 @@ class OrderButton extends Component{
 
   render(){
       switch (this.props.status) {
-        case 1:
+        case 2:
           return(
             <TouchableOpacity onPress={this.props.statusChange}>
               <View style={Styles.order_button_accept}>
@@ -221,7 +283,7 @@ class OrderButton extends Component{
               </View>
             </TouchableOpacity>
           );
-        case 2:
+        case 3:
         return(
           <TouchableOpacity onPress={this.props.statusChange}>
             <View style={Styles.order_button_accept}>
@@ -231,7 +293,7 @@ class OrderButton extends Component{
             </View >
           </TouchableOpacity>
         );
-        case 3:
+        case 4:
         return(
           <TouchableOpacity onPress={this.props.statusChange}>
             <View style={Styles.order_button_accept}>
@@ -241,7 +303,7 @@ class OrderButton extends Component{
             </View>
           </TouchableOpacity>
         );
-        case 4:
+        case 5:
         return(
           <TouchableOpacity onPress={this.props.statusChange}>
             <View style={Styles.order_button_accept}>
